@@ -1,16 +1,19 @@
-# A lot of texts in terrang_tx occurs more than one time, some of them
-# a silly amount of times (for example "Östersjön").
-#
-# This script attempts to improve the situation by building a new table
-# where duplicates have been removed.
-#
-# At the same time, we osmify the data by introducing the type column and
-# a size column, that attempts to emulate what OSM Bright uses the area_labels's
-# area attribute for, i.e. classifying features by size/importance to be able
-# to choose the right zoom level.
+/*
+ A lot of texts in terrang_tx occurs more than one time, some of them
+ a silly amount of times (for example "Östersjön").
+
+ This script attempts to improve the situation by building a new table
+ where duplicates have been removed.
+
+ At the same time, we osmify the data by introducing the type column and
+ a size column, that attempts to emulate what OSM Bright uses the area_labels's
+ area attribute for, i.e. classifying features by size/importance to be able
+ to choose the right zoom level.
+*/
 
 create table lmv_bright.area_labels (
-    gid int, the_geom geometry,
+    gid int primary key,
+    the_geom geometry,
     kkod int,
     name varchar(40),
     type varchar(16),
@@ -43,4 +46,3 @@ SELECT s.gid, s.the_geom, s.kkod, s.name, s.type, s.size FROM summary s WHERE rk
 create index on lmv_bright.area_labels (type);
 create index on lmv_bright.area_labels USING GIST (the_geom);
 
-vacuum analyze lmv_bright.area_labels;
