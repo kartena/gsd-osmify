@@ -3,9 +3,9 @@ create table lmv_bright.roads_tatort (
     the_geom geometry,
     type varchar(32),
     stylegroup varchar(32),
-    bridge boolean,
-    tunnel boolean,
-    underpass boolean,
+    bridge smallint,
+    tunnel smallint,
+    underpass smallint,
     zindex integer,
     access varchar(4)
 );
@@ -28,9 +28,9 @@ SELECT gid,
         WHEN kod IN (31, 32, 36, 39) THEN 'minorroad'
         WHEN kod IN (37, 38) THEN 'noauto'
         ELSE 'other' END AS stylegroup,
-    FALSE as bridge,
-    FALSE as tunnel,
-    niva=2 as underpass,
+    0 as bridge,
+    0 as tunnel,
+    CASE WHEN niva=2 THEN 1 ELSE 0 END as underpass,
     CASE
         WHEN kod IN (34) THEN 4
         WHEN kod IN (30) THEN 3

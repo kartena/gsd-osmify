@@ -16,9 +16,9 @@ INSERT INTO lmv_bright.roads_tatort
             WHEN kod IN (31, 32, 36, 39) THEN 'minorroad'
             WHEN kod IN (37, 38) THEN 'noauto'
             ELSE 'other' END AS stylegroup,
-        FALSE as bridge,
-        TRUE as tunnel,
-        FALSE as underpass,
+        0 as bridge,
+        1 as tunnel,
+        0 as underpass,
         CASE
             WHEN kod IN (34) THEN 4
             WHEN kod IN (30) THEN 3
