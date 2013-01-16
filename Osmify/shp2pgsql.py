@@ -18,7 +18,7 @@ def shape_to_pgsql(config, conn, shape_path, table, mode, srid=-1, log_file=None
         config.shp2pgsql,
         "-%s" % mode,
         "-W", "latin1",
-        "-s", str(srid)
+        "-s", str(srid),
         shape_path,
         table]
     p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=log_file)
