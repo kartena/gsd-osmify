@@ -10,12 +10,14 @@ Requirements
 ------------
 
 Software:
+
 * PostgreSQL (tested with 9.1)
 * PostGIS (tested with 1.5)
 * Python 2.7
 * [Godwit](https://github.com/perliedman/godwit)
 
 Data:
+
 * Lantmäteriets GSD Data in ESRI Shapefile format
 
 Usage
@@ -45,3 +47,18 @@ gsd = {
     'srid': 3006
 }
 ```
+
+After configuring, run:
+
+```
+python -m Osmify all
+```
+
+```all``` can be substituted for the mapset you want to import, and can be one
+of: ```oversikt```, ```terrang```, ```vagk```, ```tatort```. All will import all
+of them in one sweep.
+
+Import might take a long (very, very long) time. After the import, your database
+will have one table per layer from the mapsets you imported; for example all
+shape files belonging to Översiktskartan's ```my``` layer will be put into
+the table ```oversikt_my```.
