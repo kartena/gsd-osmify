@@ -1,5 +1,9 @@
 #!/usr/bin/python
 
+"""
+This is mostly a Python wrapper for the shp2pgsql command line utility.
+"""
+
 import subprocess
 import util
 
@@ -9,11 +13,12 @@ IMPORT_MODE_STRUCTURE = "p"
 IMPORT_MODE_DATA = ""
 IMPORT_MODE_SPATIAL_INDEX = ""
 
-def shape_to_pgsql(config, conn, shape_path, table, mode, log_file=None, batch_size=1000):
+def shape_to_pgsql(config, conn, shape_path, table, mode, srid=-1, log_file=None, batch_size=1000):
     args = [
         config.shp2pgsql,
         "-%s" % mode,
         "-W", "latin1",
+        "-s", str(srid)
         shape_path,
         table]
     p = subprocess.Popen(args, stdout=subprocess.PIPE, stderr=log_file)
