@@ -15,6 +15,7 @@ INSERT INTO lmv_bright.place
     WHEN kkod IN (6, 5) THEN 'village'
     WHEN kkod IN (4, 3) THEN 'hamlet'
     WHEN kkod IN (2) THEN 'locality'
+    WHEN kkod IN (11, 12, 13) THEN 'suburb' /* Tätortsdel */
     ELSE 'other' END AS type,
     'other' AS size,
     kkod as priority
