@@ -41,25 +41,25 @@ INSERT INTO lmv_bright.roads
 SELECT gid+10000000,
     the_geom,
     CASE
-        WHEN kkod IN (5011, 5016, 5034, 5811, 5816, 5834) THEN 'motorway'
-        WHEN kkod IN (5012, 5017, 5021, 5022, 5024, 5028, 5033, 5812, 5817, 5821, 5822, 5824, 5828, 5833, 5834) THEN 'trunk'
-        WHEN kkod IN (5032, 5044, 5832, 5844) THEN 'primary'
-        WHEN kkod IN (5025, 5825) THEN 'secondary'
-        WHEN kkod IN (5029, 5051, 5060, 5061, 5071, 5082, 5829, 5851, 5860, 5861, 5871, 5882) THEN 'tertiary'
+        WHEN kkod IN (5011, 5016, 5811, 5816) THEN 'motorway'
+        WHEN kkod IN (5012, 5017, 5021, 5022, 5024, 5028, 5032, 5812, 5817, 5821, 5822, 5824, 5828, 5832, 5834) THEN 'trunk'
+        WHEN kkod IN (5044, 5844) THEN 'primary'
+        WHEN kkod IN (5025, 5033, 5825, 5833) THEN 'secondary'
+        WHEN kkod IN (5029, 5034, 5051, 5060, 5061, 5071, 5082, 5829, 5834, 5851, 5860, 5861, 5871, 5882) THEN 'tertiary'
         WHEN kkod IN (5056, 5058, 5840, 5858, 5856) THEN 'residential'
         WHEN kkod IN (5091, 5891) THEN 'service'
         ELSE 'other' END AS type,
     CASE
-        WHEN kkod IN (5011, 5016, 5012, 5017, 5021, 5024, 5028, 5034, 5811, 5816, 5812, 5817, 5821, 5824, 5828, 5834) THEN 'motorway'
-        WHEN kkod IN (5022, 5025, 5032, 5033, 5822, 5825, 5833, 5834) THEN 'mainroad'
+        WHEN kkod IN (5011, 5016, 5012, 5017, 5021, 5024, 5028, 5811, 5816, 5812, 5817, 5821, 5824, 5828) THEN 'motorway'
+        WHEN kkod IN (5022, 5025, 5032, 5033, 5034, 5822, 5825, 5833, 5834) THEN 'mainroad'
         WHEN kkod IN (5029, 5051, 5058, 5060, 5061, 5056, 5044, 5091, 5071, 5082, 5829, 5851, 5856, 5858, 5860, 5861, 5840, 5844, 5891, 5844, 5871, 5882) THEN 'minorroad'
         ELSE 'other' END AS stylegroup,
     CASE
-        WHEN kkod IN (5011, 5016, 5034, 5811, 5816, 5834) THEN 7
-        WHEN kkod IN (5012, 5017, 5021, 5022, 5024, 5028, 5033, 5812, 5817, 5821, 5822, 5824, 5828, 5833, 5834) THEN 6
-        WHEN kkod IN (5032, 5044, 5832, 5844) THEN 5
+        WHEN kkod IN (5011, 5016, 5811, 5816, 5834) THEN 7
+        WHEN kkod IN (5012, 5017, 5021, 5022, 5024, 5028, 5812, 5817, 5821, 5822, 5824, 5828, 5834) THEN 6
+        WHEN kkod IN (5032, 5033, 5044, 5832, 5833, 5844) THEN 5
         WHEN kkod IN (5025, 5825) THEN 4
-        WHEN kkod IN (5029, 5051, 5060, 5061, 5071, 5082, 5829, 5851, 5860, 5861, 5871, 5882) THEN 3
+        WHEN kkod IN (5029, 5034, 5051, 5060, 5061, 5071, 5082, 5829, 5834, 5851, 5860, 5861, 5871, 5882) THEN 3
         WHEN kkod IN (5056, 5058, 5840, 5856, 5858) THEN 2
         WHEN kkod IN (5091, 5891) THEN 1
         ELSE 0 END AS zindex,
