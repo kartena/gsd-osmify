@@ -18,7 +18,8 @@ INSERT INTO lmv_bright.landuse_terrang
         WHEN kategori='Industriområde' THEN 'industrial'
         WHEN kategori IN ('Låg bebyggelse', 'Sluten bebyggelse', 'Hög bebyggelse') THEN 'residential'
         WHEN kategori IN ('Skog, barr- och blandskog', 'Fjällbjörkskog', 'Lövskog') THEN 'wooded'
-        WHEN kategori IN ('Vattenyta', 'Vattenyta med diffus strandlinje') THEN 'water'
+        WHEN kategori IN ('Vattenyta', 'Vattenyta med diffus strandlinje') THEN 'water' 
+        WHEN kategori IN ('Kalfjäll') THEN 'fell'
         ELSE 'other' END as type
     FROM terrang_my;
 
@@ -30,7 +31,8 @@ INSERT INTO lmv_bright.landuse_oversikt
         WHEN kategori IN ('Annan koncentrerad bebyggelse', 'Tätort') THEN 'residential'
         WHEN kategori IN ('Skogsmark') THEN 'wooded'
         WHEN kategori IN ('Vattenyta', 'Hav, territorialt vatten') THEN 'water'
-        /* TODO: kalfjäll, glaciär, alvarmark */
+        WHEN kategori IN ('Kalfjäll') THEN 'fell'
+        WHEN kategori IN ('Glaciär') THEN 'glacier'
         ELSE 'other' END as type
     FROM oversikt_my;
 
