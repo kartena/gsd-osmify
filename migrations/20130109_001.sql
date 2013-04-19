@@ -43,6 +43,21 @@ WITH summary AS (
     FROM terrang_tx)
 SELECT s.gid, s.the_geom, s.kkod, s.name, s.type, s.size FROM summary s WHERE rk=1;
 
+/*
+    This inserts Idrottsanläggningar into area_labels.
+
+    Unfortunately, we need some way to classify their size corretly.
+    Also, we need to join polygons that intersect/touch and have the same
+    name, since Lantmäteriet has the nasty habit of dividing an area into
+    four with the same name, which looks awful if you just show them on
+    the map naïvely.
+
+
+INSERT INTO lmv_bright.area_labels
+    SELECT gid + 10000000, st_centroid(the_geom), kod, namn AS name, 'sports' AS type, 1 AS size
+    FROM tatort_bi;
+*/
+
 create index on lmv_bright.area_labels (type);
 create index on lmv_bright.area_labels USING GIST (the_geom);
 
