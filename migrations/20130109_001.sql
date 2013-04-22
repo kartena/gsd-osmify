@@ -40,8 +40,16 @@ WITH summary AS (
             WHEN kkod IN(192, 193, 194, 195, 196, 197, 198, 199) THEN kkod - 190
             ELSE 0 END AS size,
         ROW_NUMBER() OVER(PARTITION BY text,kkod) AS rk
-    FROM terrang_tx)
+    FROM terrang_tx
+    WHERE kkod<61 OR kkod>67 /* Possibly refine, but at least not these, since we handle them below */)
 SELECT s.gid, s.the_geom, s.kkod, s.name, s.type, s.size FROM summary s WHERE rk=1;
+
+/* Insert these without removing duplicates, since they contain general
+   information like "Skjutfält". */
+INSERT INTO lmv_bright.area_labels
+    SELECT gid + 10000000, the_geom, kkod, text AS name, 'other' AS type, kkod - 59 AS size
+    FROM terrang_tx
+    WHERE kkod>=61 AND kkod<=67
 
 /*
     This inserts Idrottsanläggningar into area_labels.
