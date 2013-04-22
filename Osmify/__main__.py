@@ -52,8 +52,12 @@ for m in maps:
         srid = config.gsd['srid']
     else:
         srid = -1
+    
+    proto_files = gsd_map.prototype_files()
+    if len(proto_files) == 0:
+        print "Warning: no structure prototype files found for %s in %s" % (m, config.gsd['path'])
 
-    for f in gsd_map.prototype_files():
+    for f in proto_files:
         filename = os.path.splitext(os.path.split(f)[1])[0]
         table = '%s_%s' % (m, filename.split('_')[0])
         shape_to_pgsql(config, conn, f, table, \

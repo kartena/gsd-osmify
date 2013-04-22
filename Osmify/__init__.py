@@ -7,12 +7,14 @@ class GsdMap:
         self.map_dir = map_dir
 
     def prototype_files(self):
-        # All Shape files in the first subdir we can find.
+        # All Shape files in the all direct subdir we can find.
+        result = {}
         for root, dirs, files, level in util.walk2(self.map_dir):
             if level == 1:
-                return [os.path.join(root, f) for f in files if os.path.splitext(f)[1] == '.shp']
+                for f in [(os.path.split(f)[1].split('_')[0], os.path.join(root, f)) for f in files if os.path.splitext(f)[1] == '.shp']:
+                              result[f[0]] = f[1]
 
-        return []
+        return result.values()
 
     def data_files(self):
         result = []
