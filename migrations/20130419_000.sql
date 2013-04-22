@@ -7,8 +7,8 @@ create table lmv_bright.landuse_overlays (
 INSERT INTO lmv_bright.landuse_overlays
     SELECT gid, the_geom,
     CASE
-        WHEN funktion IN ('Golfbana') THEN 'golf_course'
-        WHEN funktion IN ('Övrigt') THEN 'other'
+        WHEN funktion IN ('GOLFBANA') THEN 'golf_course'
+        WHEN funktion IN ('ÖVRIGT') THEN 'other'
         ELSE 'pitch' END AS type
     FROM tatort_bi;
 
