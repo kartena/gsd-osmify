@@ -26,12 +26,11 @@ INSERT INTO lmv_bright.road_label
         ELSE 'other' END AS type,
     0 as priority
     FROM vagk_vl_joined
-    WHERE kkod IN (5011, 5012, 5016, 5017, 5021, 5022, 5024, 5025, 5028, 5033, 5036, 5811, 5812, 5816, 5817, 5821, 5822, 5824, 5825, 5828, 5833, 5836);
+    WHERE kkod IN (5022, 5025, 5033, 5036, 5822, 5825, 5833, 5836);
 
 INSERT INTO lmv_bright.road_label
     SELECT gid+1000000, the_geom, namn1 AS name, FALSE as oneway,
     CASE
-        WHEN kod IN (34) THEN 'motorway'
         WHEN kod IN (30) THEN 'trunk'
         WHEN kod IN (31) THEN 'primary'
         WHEN kod IN (33) THEN 'secondary'
