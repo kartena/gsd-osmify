@@ -1,6 +1,5 @@
 create table lmv_bright.place (
     gid int primary key,
-    the_geom geometry,
     kkod int,
     name varchar(40),
     type varchar(16),
@@ -8,31 +7,49 @@ create table lmv_bright.place (
     priority integer
 );
 
+select AddGeometryColumn('lmv_bright', 'place', 'the_geom', 3006, 'POINT', 2);
+
 INSERT INTO lmv_bright.place
-    SELECT gid, the_geom, kkod, text as name,
+    SELECT gid, kkod, text as name,
     CASE
-    /* Larger places (kkod 9-7) selected from oversikt_tx */
-    WHEN kkod IN (6, 5) THEN 'village'
+    /* Larger places selected from oversikt_mb */
     WHEN kkod IN (4, 3) THEN 'hamlet'
     WHEN kkod IN (2) THEN 'locality'
     WHEN kkod IN (11, 12, 13) THEN 'suburb' /* Tätortsdel */
     ELSE 'other' END AS type,
     'other' AS size,
-    kkod as priority
-    FROM vagk_tx;
+    kkod as priority,
+    ST_SetSRID(the_geom, 3006) /* Should not be necessary if vagk_tx has SRID properly set */
+    FROM vagk_tx
+    WHERE kkod IN (2, 3, 4, 11, 12, 13);
+
+
+/* Idea: instead of choosing arbitrary limits for what constitutes a major city, 
+   what constitutes a city, etc., build a table and sort by population.
+   Let the first three be major cities, the next 15-20 be cities, and so on. 
+   Easier to adjust to a suitable density of cities, towns, etc. */
 
 INSERT INTO lmv_bright.place
-    SELECT gid+1000000, the_geom, kkod, text as name,
+    SELECT gid+1000000, kkod, namn as name,
     CASE
-    WHEN kkod IN (4, 9, 104, 109) THEN 'city'
-    WHEN kkod IN (8, 7, 108, 107) THEN 'town'
-    ELSE 'other' END AS type,
+    WHEN bef>40000 THEN 'city'
+    WHEN bef>8000 THEN 'town'
+    WHEN bef>2000 THEN 'village'
+    ELSE 'hamlet' END AS type,
     CASE
-    WHEN text IN ('Göteborg', 'Stockholm', 'Malmö') THEN 'major' /* Woho! */
+    WHEN bef>200000 THEN 'major'
     ELSE 'other' END AS size,
-    7 as priority
-    FROM oversikt_tx
-    WHERE kkod IN (4, 9, 8, 7, 104, 109, 108, 107);
+    bef/500 AS priority, 
+    ST_Centroid(the_geom)
+    FROM (
+        SELECT MIN(gid) gid, ST_Union(the_geom) the_geom, MIN(kkod) kkod, 
+        CASE
+        WHEN namn2 IS NULL OR namn2='' THEN namn1
+        ELSE namn1 || E'\n(' || namn2 || ')' END AS namn, 
+        max(bef) bef
+        FROM oversikt_mb
+        WHERE namn1 != 'Rolfhamre och Måga' /* filter error in Lanmäteriet's data (2013) */
+        GROUP BY tatnr, namn1, namn2) AS tatort_union;
 
 create index on lmv_bright.place (type, size);
 create index on lmv_bright.place using gist (the_geom);
