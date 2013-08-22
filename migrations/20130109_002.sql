@@ -13,15 +13,15 @@ INSERT INTO lmv_bright.place
     SELECT gid, kkod, text as name,
     CASE
     /* Larger places selected from oversikt_mb */
-    WHEN kkod IN (4, 3) THEN 'hamlet'
-    WHEN kkod IN (2) THEN 'locality'
+    WHEN kkod IN (4, 3, 2) THEN 'hamlet'
+    WHEN kkod IN (1) THEN 'locality'
     WHEN kkod IN (11, 12, 13) THEN 'suburb' /* Tätortsdel */
     ELSE 'other' END AS type,
     'other' AS size,
     kkod as priority,
     ST_SetSRID(the_geom, 3006) /* Should not be necessary if vagk_tx has SRID properly set */
     FROM vagk_tx
-    WHERE kkod IN (2, 3, 4, 11, 12, 13);
+    WHERE kkod IN (1, 2, 3, 4, 11, 12, 13);
 
 
 /* Idea: instead of choosing arbitrary limits for what constitutes a major city, 
@@ -40,7 +40,7 @@ INSERT INTO lmv_bright.place
     WHEN bef>200000 THEN 'major'
     ELSE 'other' END AS size,
     bef/500 AS priority, 
-    ST_Centroid(the_geom)
+    ST_SetSRID(ST_Centroid(the_geom), 3006) /* Should not be necessary if oversikt_mb has SRID properly set */
     FROM (
         SELECT MIN(gid) gid, ST_Union(the_geom) the_geom, MIN(kkod) kkod, 
         CASE
