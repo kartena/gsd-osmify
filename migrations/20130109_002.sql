@@ -2,6 +2,7 @@ create table lmv_bright.place (
     gid int primary key,
     kkod int,
     name varchar(40),
+    src_name varchar(40),
     type varchar(16),
     size varchar(8),
     priority integer
@@ -10,7 +11,7 @@ create table lmv_bright.place (
 select AddGeometryColumn('lmv_bright', 'place', 'the_geom', 3006, 'POINT', 2);
 
 INSERT INTO lmv_bright.place
-    SELECT gid, kkod, text as name,
+    SELECT gid, kkod, text as name, text as src_name,
     CASE
     /* Larger places selected from oversikt_mb */
     WHEN kkod IN (4, 3, 2) THEN 'hamlet'
@@ -30,7 +31,7 @@ INSERT INTO lmv_bright.place
    Easier to adjust to a suitable density of cities, towns, etc. */
 
 INSERT INTO lmv_bright.place
-    SELECT gid+1000000, kkod, namn as name,
+    SELECT gid+1000000, kkod, namn as name, src_name,
     CASE
     WHEN bef>40000 THEN 'city'
     WHEN bef>8000 THEN 'town'
@@ -46,6 +47,7 @@ INSERT INTO lmv_bright.place
         CASE
         WHEN namn2 IS NULL OR namn2='' THEN namn1
         ELSE namn1 || E'\n(' || namn2 || ')' END AS namn, 
+        namn1 as src_name,
         max(bef) bef
         FROM oversikt_mb
         WHERE namn1 != 'Rolfhamre och Måga' /* filter error in Lanmäteriet's data (2013) */
@@ -54,3 +56,15 @@ INSERT INTO lmv_bright.place
 create index on lmv_bright.place (type, size);
 create index on lmv_bright.place using gist (the_geom);
 
+/* Filter out places with the same name that are less than 10 km
+   from each other, since they're most likely duplicates. */
+delete from lmv_bright.place where gid in (
+    select p2.gid
+    from lmv_bright.place p1
+    inner join lmv_bright.place p2 
+        on p1.gid!=p2.gid /* don't do < or other smart things, has to be by priority */
+        and p1.src_name=p2.src_name
+        and p1.priority>=p2.priority
+    where st_distance(p1.the_geom, p2.the_geom) < 10000);
+
+alter table lmv_bright.place drop column src_name;
