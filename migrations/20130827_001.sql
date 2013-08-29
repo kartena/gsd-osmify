@@ -15,7 +15,7 @@ insert into lmv_bright.tatort_coverage
 	select row_number() over(), st_setsrid(the_geom, 3006)
 	from (
 		select (st_dump(st_union(the_geom))).geom the_geom
-		from (select the_geom from tatort_my) t_my
+		from (select the_geom from tatort_my where ST_IsValid(the_geom)) t_my
 		) as u;
 
 create index on lmv_bright.tatort_coverage using gist (the_geom);
