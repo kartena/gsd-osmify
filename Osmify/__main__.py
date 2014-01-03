@@ -1,8 +1,8 @@
 import os
-import glob
 import config
 import psycopg2
 from sys import argv
+from Godwit import MigratePostgres
 
 from Osmify import Oversiktskartan, Terrangkartan, Vagkartan, Tatortskartan
 from Osmify.shp2pgsql import shape_to_pgsql, vacuum_analyze, \
@@ -20,22 +20,6 @@ conn = psycopg2.connect("host=%s dbname=%s user=%s password=%s" % \
 scope = argv[1]
 maps = [x for x in ['oversikt', 'terrang', 'vagk', 'tatort'] if scope == 'all' or x == scope]
 
-# TODO:
-# Ideally, we should use Godwit here to get the current db schema version.
-# If no schema version is found (i.e. there's no _version table), we can
-# assume a fresh db and do the import from scratch. If it has a version, the
-# import is assumed to have been run earlier.
-#
-# After the import, or if the import is already run, we perform all migrations
-# up to the latest known version.
-#
-# This should be easy to code, but relies on being able to import Godwit in a
-# sane way, which you currenly can. So please package Godwit so that we can
-# pip install it and just import it here.
-#
-# For now, you will have to run Godwit manually with the migration scripts
-# from the migrations directory. That works as well.
-
 for m in maps:
     if m == 'oversikt':
         gsd_map = Oversiktskartan(config.gsd['path'])
@@ -52,7 +36,7 @@ for m in maps:
         srid = config.gsd['srid']
     else:
         srid = -1
-    
+
     proto_files = gsd_map.prototype_files()
     if len(proto_files) == 0:
         print "Warning: no structure prototype files found for %s in %s" % (m, config.gsd['path'])
@@ -84,3 +68,5 @@ for m in maps:
             cursor.close()
 
         vacuum_analyze(conn, table)
+
+    MigratePostgres(conn, 'migrations', True).migrate()
