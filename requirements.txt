@@ -1,0 +1,4 @@
+argparse==1.2.1
+godwit==0.0.2
+psycopg2==2.5.1
+wsgiref==0.1.2
