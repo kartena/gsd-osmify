@@ -6,6 +6,8 @@ OSMify is built for two purposes:
 * Import [Lantmäteriets GSD data](http://www.lantmateriet.se/Kartor-och-geografisk-information/Kartor/Sverigekartor/GSD-Sverigekartor-vektor/) from Shape files to PostGis
 * Package (parts of) the data in a form that more resembles OpenStreetMap's structure, particularily to be able to use MapBox's [OSM Bright](https://github.com/mapbox/osm-bright) styling with as few modifications as possible.
 
+In addition to the GSD data, it actually also supports [Fastighetskartan](https://www.lantmateriet.se/sv/Kartor-och-geografisk-information/Kartor/Fastighetskartan/), although not a part of GSD.
+
 Requirements
 ------------
 
@@ -15,6 +17,7 @@ Software:
 * PostGIS (tested with 1.5)
 * Python 2.7
 * [Godwit](https://github.com/perliedman/godwit)
+* [ogr2ogr](http://www.gdal.org/ogr2ogr.html) to use with Fastighetskartan
 
 Data:
 
@@ -55,7 +58,7 @@ python -m Osmify all
 ```
 
 ```all``` can be substituted for the mapset you want to import, and can be one
-of: ```oversikt```, ```terrang```, ```vagk```, ```tatort```. All will import all
+of: ```oversikt```, ```terrang```, ```vagk```, ```tatort```, `fastighk`. All will import all
 of them in one sweep.
 
 Import might take a long (very, very long) time. After the import, your database
