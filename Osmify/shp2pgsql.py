@@ -6,17 +6,20 @@ This is mostly a Python wrapper for the shp2pgsql command line utility.
 
 import subprocess
 import util
-
-IMPORT_MODE_CREATE = "c"
-IMPORT_MODE_APPEND = "a"
-IMPORT_MODE_STRUCTURE = "p"
-IMPORT_MODE_DATA = ""
-IMPORT_MODE_SPATIAL_INDEX = ""
+from importer_modes import *
 
 def shape_to_pgsql(config, conn, shape_path, table, mode, srid=-1, log_file=None, batch_size=1000):
+    modeflags = {
+        str(IMPORT_MODE_CREATE): "c",
+        str(IMPORT_MODE_APPEND): "a",
+        str(IMPORT_MODE_STRUCTURE): "p",
+        str(IMPORT_MODE_DATA): "",
+        str(IMPORT_MODE_SPATIAL_INDEX): ""
+    }
+
     args = [
         config.shp2pgsql,
-        "-%s" % mode,
+        "-%s" % ''.join([modeflags[f] for f in modeflags.keys() if int(f) & mode]),
         "-W", "latin1",
         "-s", str(srid),
         shape_path,
