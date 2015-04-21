@@ -26,5 +26,5 @@ insert into lmv_bright.waterway_low
 	from oversikt_hl
 		where kkod in (9021, 9022);
 
-create index on lmv_bright.place (type);
+create index on lmv_bright.waterway_low (type);
 create index on lmv_bright.waterway_low using gist (the_geom);
