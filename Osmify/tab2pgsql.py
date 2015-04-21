@@ -24,7 +24,7 @@ def tab_to_pgsql(config, conn, tab_path, table, mode, srid=-1, log_file=None, ba
 
     args = [
         config.ogr2ogr,
-        '--config', 'GEOMETRY_NAME', 'the_geom',
+        '-lco', 'GEOMETRY_NAME=the_geom',
 #        '--config', 'PG_USE_COPY', 'YES',
         '--config', 'PGCLIENTENCODING', 'LATIN1',
         '-lco', 'SRID=%d' % srid,
