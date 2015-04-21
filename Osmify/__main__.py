@@ -93,8 +93,8 @@ migrations_dir = config.migrations_dir \
     else 'migrations'
 migrate = MigratePostgres(conn, migrations_dir, True)
 
-#if not migrate.get_current_version():
-import_shape(maps)
+if not migrate.get_current_version():
+    import_shape(maps)
 
 #TODO: version
-#migrate.migrate()
+migrate.migrate()
