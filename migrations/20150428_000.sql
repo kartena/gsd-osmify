@@ -4,7 +4,7 @@ ALTER TABLE lmv_bright.railway drop constraint enforce_geotype_the_geom;
 ALTER TABLE lmv_bright.railway DROP COLUMN the_geom;
 ALTER TABLE lmv_bright.railway ADD COLUMN the_geom geometry(LineString,3006);
 CREATE INDEX ON lmv_bright.railway
-  USING GIST(the_geom)
+  USING GIST(the_geom);
 
 INSERT INTO lmv_bright.railway (gid, the_geom, type, stylegroup, bridge, tunnel)
     SELECT ogc_fid, the_geom,
