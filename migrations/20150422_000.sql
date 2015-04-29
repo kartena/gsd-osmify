@@ -30,13 +30,7 @@ insert into named_buildings (gid, name, type, huvudbyggn, the_geom)
     else ''
     end, b1.huvudbyggn, b1.the_geom
     from public.fastighk_by b1
-    where b1.namn1!='' or andamal_1 in (
-        318,
-        319,
-        321,
-        308,
-        317
-    );
+    where b1.namn1!='';
 
 select count(*) from named_buildings;
 
