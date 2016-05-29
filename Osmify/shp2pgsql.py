@@ -21,6 +21,7 @@ def shape_to_pgsql(config, conn, shape_path, table, mode, srid=-1, log_file=None
         config.shp2pgsql,
         "-%s" % ''.join([modeflags[f] for f in modeflags.keys() if int(f) & mode]),
         "-W", "latin1",
+        "-g", "the_geom",
         "-s", str(srid),
         shape_path,
         table]
