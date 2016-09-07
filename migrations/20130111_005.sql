@@ -33,5 +33,5 @@ insert into lmv_bright.inre_norrland_roads
         bklass,
         trikt,
         hmark,
-        st_difference(vagk_vl.the_geom, c.the_geom) AS d
+        st_difference(ST_SetSRID(vagk_vl.the_geom, 3006), ST_SetSRID(c.the_geom, 3006)) AS d
     from vagk_vl, lmv_bright.terrang_coverage_simple as c;

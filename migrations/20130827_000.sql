@@ -1,4 +1,4 @@
-alter table terrang_hl drop constraint enforce_srid_the_geom;
+alter table terrang_hl drop constraint if exists enforce_srid_the_geom;
 
 update terrang_hl set the_geom=st_setsrid(the_geom,3006);
 
