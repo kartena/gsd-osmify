@@ -15,7 +15,7 @@ create table tatort_bi (
     adat varchar(16),
     xyfel float,
     namn varchar(45),
-    funktion varchar(20),
+    funktion varchar(20)
 );
 
 create index on tatort_bi USING GIST (the_geom);
