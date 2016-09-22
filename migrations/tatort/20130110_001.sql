@@ -28,15 +28,30 @@ INSERT INTO lmv_bright.road_label
     FROM vagk_vl_joined
     WHERE kkod IN (5022, 5025, 5033, 5036, 5822, 5825, 5833, 5836);
 
-INSERT INTO lmv_bright.road_label
-    SELECT gid+1000000, the_geom, namn1 AS name, FALSE as oneway,
+INSERT INTO lmv_bright.road_label (gid, the_geom, name, oneway, type, priority)
+    SELECT ogc_fid+1000000, ST_MULTI(the_geom),
     CASE
-        WHEN kod IN (30) THEN 'trunk'
-        WHEN kod IN (31) THEN 'primary'
-        WHEN kod IN (33) THEN 'secondary'
+        WHEN namn1 IS NOT NULL THEN namn1
+        WHEN vagnr3 IS NOT NULL THEN vagnr1 || ' / ' || vagnr2 || ' / ' || vagnr3
+        WHEN vagnr2 IS NOT NULL THEN vagnr1 || ' / ' || vagnr2
+        ELSE vagnr1 END as name,
+    FALSE as oneway,
+    CASE
+        WHEN detaljtyp IN ('VÄGMO.D', 'VÄGMOU.D') THEN 'motorway' /* Tätort KOD 34 */
+        WHEN detaljtyp IN ('VÄGA1.M', 'VÄGA1U.M', 'VÄGA2.M', 'VÄGA2U.M') THEN 'trunk' /* Tätort KOD 30 */
+        WHEN detaljtyp IN ('VÄGA2.M', 'VÄGA2U.M', 'VÄGAS.D', 'VÄGASU.D') THEN 'primary' /* Tätort KOD 31 */
+        WHEN detaljtyp IN ('VÄGGG.M', 'VÄGGG.D', 'VÄGGGU.M') THEN 'secondary' /* Tätort KOD 33 */
+        WHEN detaljtyp IN ('VÄGBN.M', 'VÄGBNU.M') THEN 'tertiary' /* Tätort KOD 32, previously also included KOD 39, seems to be missing from fastighk */
+        WHEN detaljtyp IN ('VÄGBS.M', 'VÄGBSU.M', 'VÄGA3.M', 'VÄGA3U.M') THEN 'unclassified' /* Tätort KOD 36 */
         ELSE 'other' END AS type,
-    1 as priority
-    FROM tatort_vl;
+    CASE
+        WHEN detaljtyp IN ('VÄGMO.D', 'VÄGMOU.D') THEN 4 /* Tätort KOD 34 */
+        WHEN detaljtyp IN ('VÄGA1.M', 'VÄGA1U.M', 'VÄGA2.M', 'VÄGA2U.M') THEN 3 /* Tätort KOD 30 */
+        WHEN detaljtyp IN ('VÄGA2.M', 'VÄGA2U.M', 'VÄGAS.D', 'VÄGASU.D') THEN 2 /* Tätort KOD 31 */
+        WHEN detaljtyp IN ('VÄGGG.M', 'VÄGGG.D', 'VÄGGGU.M') THEN 1 /* Tätort KOD 33 */
+        ELSE 0 END as priority
+    FROM tatort_vl
+    WHERE detaljtyp != 'FÄRJELED' AND (vagnr1 != '' OR namn1 != '');
 
 create index on lmv_bright.road_label (type, priority);
 create index on lmv_bright.road_label using gist (the_geom);

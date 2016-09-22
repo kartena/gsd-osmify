@@ -1,3 +1,6 @@
+/* Create lmv_bright.poi from building names in
+   tatort_by. */
+
 CREATE TABLE "lmv_bright"."poi" (
     gid int primary key,
     name varchar(45),
@@ -7,77 +10,48 @@ CREATE TABLE "lmv_bright"."poi" (
 );
 CREATE INDEX ON lmv_bright.poi USING GIST (the_geom);
 
-CREATE OR REPLACE FUNCTION SP_CreateLmPoi() RETURNS void AS $$
-DECLARE last_name varchar;
-    distance float;
-    list_count int;
+/* Remove duplicates. Lots of nearby buildings share the
+   same name. Buildings with huvudbyggn='J' should have
+   priority, but when there's no huvudbyggnad, or more than
+   one, we choose the largest one. */
 
-    -- the cursor will contain all the poi names which are not empty and 
-    -- will be ordered by name
-    cur_iterator CURSOR FOR
-                SELECT
-                    bf.gid AS gid,
-                    bf.namn1 AS name,
-                    bf.funktion1 AS funktion1,
-                    ST_Centroid(bf.the_geom) AS the_geom,
-                    bf.kommunkod AS kommunkod
-                FROM tatort_bf AS bf
-                WHERE bf.namn1 IS NOT NULL
-                ORDER BY bf.namn1, bf.kommunkod;
+/* Insert all buildings with names into a temporary table */
+create temp table named_buildings (
+    gid int,
+    name varchar(45),
+    type varchar(26),
+    huvudbyggn varchar(1),
+    the_geom geometry
+);
 
-BEGIN
-    RAISE NOTICE 'Beginning';
-        last_name := '';
-        FOR it IN cur_iterator LOOP
-            -- If the name is a new one
-            IF it.name != last_name THEN
-                /*
-                    1) Save the information from the list to the final table
-                    2) Clean the list (to start over)
-                    3) Insert the first new point to the list
-                */
-                INSERT INTO lmv_bright.poi
-                SELECT l.gid, l.name, l.type, ST_PointFromText(ST_AsText(l.the_geom), 3006), l.municipality
-                FROM list l;
-                DELETE FROM list;
+create index on named_buildings (name, huvudbyggn);
+create index on named_buildings using gist (the_geom);
 
-                --Inserting the new point to the list
-                INSERT INTO list(gid, name, type, the_geom, municipality)
-                    VALUES (it.gid, it.name, it.funktion1, it.the_geom, it.kommunkod);
-            ELSE -- If the name is repeated
-                /*
-                    1) If the list has any value in it:
-                    1.1) Get the Min distance between the current point and all the points in the list
-                    1.2) If the min value is more than a threshold (150 meters) => add it to the list
-                    1.3) If the min value is less than the threshold => skip it
-                    2) If the list is empty => add the new point to the list
+insert into named_buildings (gid, name, type, huvudbyggn, the_geom)
+    select b1.ogc_fid, b1.namn1,
+    case
+    when andamal_1t in ('Samhällsfunktion; Sjukhus') then 'SJUKHUS'
+    when andamal_1t in ('Samhällsfunktion; Skola') then 'SKOLA'
+    when andamal_1t in ('Samhällsfunktion; Universitet') then 'UNIVERSITET'
+    when andamal_1t in ('Samhällsfunktion; Högskola') then 'HÖGSKOLA'
+    when andamal_1t in ('Samhällsfunktion; Samfund') then 'SAMFUND'
+    else ''
+    end, b1.huvudbyggn, b1.the_geom
+    from public.tatort_by b1
+    where b1.namn1!='';
 
-                */
-                SELECT COUNT(*) INTO list_count FROM list;
-                IF list_count > 0 THEN
-                    SELECT MIN(ST_Distance(it.the_geom, l.the_geom)) INTO distance FROM list l;
-                    -- RAISE NOTICE 'Distance: %f', distance;
-                    IF distance > 150 THEN
-                        RAISE NOTICE 'Inserting %s', it.name;
-                        INSERT INTO list(gid, name, type, the_geom, municipality)
-                        VALUES (it.gid, it.name, it.funktion1, it.the_geom, it.kommunkod);
-                    END IF;
-                ELSE
-                    RAISE NOTICE 'Inserting %s', it.name;
-                    INSERT INTO list(gid, name, type, the_geom, municipality)
-                        VALUES (it.gid, it.name, it.funktion1, it.the_geom, it.kommunkod);
-                END IF;
-            END IF;
-            last_name := it.name;
-            -- RAISE NOTICE 'Iterator name: %s', it.name;
-        END LOOP;
-        SELECT COUNT(*) INTO list_count FROM list;
-        IF list_count > 0 THEN
-            RAISE NOTICE 'Inserting %s', last_name;
-            INSERT INTO lmv_bright.poi
-            SELECT l.gid, l.name, l.type, ST_PointFromText(ST_AsText(l.the_geom), 3006), l.municipality
-            FROM list l;
-            DELETE FROM list;
-        END IF;
-END
-$$ LANGUAGE plpgsql;
+select count(*) from named_buildings;
+
+/* Find all duplicates and delete them */
+delete from named_buildings where gid in (
+    select p2.gid
+    from named_buildings p1
+    inner join named_buildings p2 
+        on p1.gid!=p2.gid /* don't do < or other smart things, has to be by priority */
+        and st_distance(p1.the_geom, p2.the_geom) < 1000
+        and p1.name!='' and p2.name!='' and p1.name=p2.name
+        and ((p1.huvudbyggn='J' and p2.huvudbyggn='') OR (p1.huvudbyggn=p2.huvudbyggn and st_area(p1.the_geom) > st_area(p2.the_geom)))
+);
+
+insert into lmv_bright.poi (gid, name, type, the_geom)
+    select gid, name, type, st_centroid(the_geom) from named_buildings;

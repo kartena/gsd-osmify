@@ -7,13 +7,12 @@ create table lmv_bright.landuse_tatort (
 INSERT INTO lmv_bright.landuse_tatort
     SELECT gid, the_geom,
     CASE
-        WHEN objekt IN ('Vatten') THEN 'water'
-        WHEN objekt IN ('Öppen mark', 'Ospecificerad', 'Övrig mark') THEN 'land'
-        WHEN objekt IN ('Torg') THEN 'pedestrian'
-        WHEN objekt IN ('Industriområde') THEN 'industrial'
-        WHEN objekt IN ('Låg bebyggelse', 'Sluten bebyggelse', 'Hög bebyggelse') THEN 'residential'
-        WHEN objekt IN ('Skog') THEN 'wooded'
-        WHEN objekt IN ('Sankmark') THEN 'wetland'
+        WHEN detaljtyp IN ('VATTEN') THEN 'water'
+        WHEN detaljtyp IN ('ÖPMARK', 'OSPEC', 'MRKÖVR') THEN 'land'
+        WHEN detaljtyp IN ('ÖPTORG') THEN 'pedestrian'
+        WHEN detaljtyp IN ('BEBIND') THEN 'industrial'
+        WHEN detaljtyp IN ('BEBLÅG', 'BEBSLUT', 'BEBHÖG') THEN 'residential'
+        WHEN detaljtyp IN ('SKOGBARR', 'SKOGLÖV', 'SKOGFBJ') THEN 'wooded'
         ELSE 'other' END AS type
     FROM tatort_my;
 

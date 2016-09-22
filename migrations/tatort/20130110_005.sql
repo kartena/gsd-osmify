@@ -1,4 +1,4 @@
-INSERT INTO lmv_bright.roads_tatort
+/* INSERT INTO lmv_bright.roads_tatort
     SELECT gid,
         the_geom,
         CASE
@@ -30,4 +30,4 @@ INSERT INTO lmv_bright.roads_tatort
             WHEN kod=39 THEN 'no'
             ELSE 'yes' END as access
       FROM tatort_vl
-      WHERE niva=3 AND kod IN (34, 30, 31, 33, 32, 36, 37, 38, 39);
+      WHERE niva=3 AND kod IN (34, 30, 31, 33, 32, 36, 37, 38, 39); */

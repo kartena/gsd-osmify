@@ -10,39 +10,37 @@ create table lmv_bright.roads_tatort (
     access varchar(4)
 );
 
-INSERT INTO lmv_bright.roads_tatort
-SELECT gid,
+INSERT INTO lmv_bright.roads_tatort (gid, the_geom, type, stylegroup, bridge, tunnel, underpass, zindex, access)
+SELECT ogc_fid,
     the_geom,
     CASE
-        WHEN kod IN (34) THEN 'motorway'
-        WHEN kod IN (30) THEN 'trunk'
-        WHEN kod IN (31) THEN 'primary'
-        WHEN kod IN (33) THEN 'secondary'
-        WHEN kod IN (32, 39) THEN 'tertiary'
-        WHEN kod IN (36) THEN 'unclassified'
-        WHEN kod IN (37, 38) THEN 'footway'
+        WHEN detaljtyp IN ('VÄGMO.D', 'VÄGMOU.D') THEN 'motorway' /* Tätort KOD 34 */
+        WHEN detaljtyp IN ('VÄGA1.M', 'VÄGA1U.M', 'VÄGA2.M', 'VÄGA2U.M') THEN 'trunk' /* Tätort KOD 30 */
+        WHEN detaljtyp IN ('VÄGA2.M', 'VÄGA2U.M', 'VÄGAS.D', 'VÄGASU.D') THEN 'primary' /* Tätort KOD 31 */
+        WHEN detaljtyp IN ('VÄGGG.M', 'VÄGGG.D', 'VÄGGGU.M') THEN 'secondary' /* Tätort KOD 33 */
+        WHEN detaljtyp IN ('VÄGBN.M', 'VÄGBNU.M') THEN 'tertiary' /* Tätort KOD 32, previously also included KOD 39, seems to be missing from fastighk */
+        WHEN detaljtyp IN ('VÄGBS.M', 'VÄGBSU.M', 'VÄGA3.M', 'VÄGA3U.M') THEN 'unclassified' /* Tätort KOD 36 */
         ELSE 'other' END AS type,
     CASE
-        WHEN kod IN (34) THEN 'motorway'
-        WHEN kod IN (30, 33) THEN 'mainroad'
-        WHEN kod IN (31, 32, 36, 39) THEN 'minorroad'
-        WHEN kod IN (37, 38) THEN 'noauto'
+        WHEN detaljtyp IN ('VÄGMO.D', 'VÄGMOU.D') THEN 'motorway'
+        WHEN detaljtyp IN ('VÄGA1.M', 'VÄGA1U.M', 'VÄGA2.M', 'VÄGA2U.M', 'VÄGGG.M', 'VÄGGG.D', 'VÄGGGU.M') THEN 'mainroad'
+        WHEN detaljtyp IN ('VÄGA2.M', 'VÄGA2U.M', 'VÄGAS.D', 'VÄGASU.D', 'VÄGBN.M', 'VÄGBNU.M', 'VÄGBS.M', 'VÄGBSU.M', 'VÄGA3.M', 'VÄGA3U.M') THEN 'minorroad'
         ELSE 'other' END AS stylegroup,
     0 as bridge,
-    0 as tunnel,
+    CASE
+        WHEN niva = 3 THEN 1
+        ELSE 0 END AS tunnel,
     CASE WHEN niva=2 THEN 1 ELSE 0 END as underpass,
     CASE
-        WHEN kod IN (34) THEN 4
-        WHEN kod IN (30) THEN 3
-        WHEN kod IN (31) THEN 2
-        WHEN kod IN (33) THEN 1
-        WHEN kod IN (32) THEN 0
+        WHEN detaljtyp IN ('VÄGMO.D', 'VÄGMOU.D') THEN 4
+        WHEN detaljtyp IN ('VÄGA1.M', 'VÄGA1U.M', 'VÄGA2.M', 'VÄGA2U.M') THEN 3
+        WHEN detaljtyp IN ('VÄGA2.M', 'VÄGA2U.M', 'VÄGAS.D', 'VÄGASU.D') THEN 2
+        WHEN detaljtyp IN ('VÄGGG.M', 'VÄGGG.D', 'VÄGGGU.M') THEN 1
+        WHEN detaljtyp IN ('VÄGBN.M', 'VÄGBNU.M') THEN 0
         ELSE -1 END AS zindex,
-    CASE
-        WHEN kod=39 THEN 'no'
-        ELSE 'yes' END as access
+    'yes' as access
   FROM tatort_vl
-  WHERE niva IN (1, 2) AND kod IN (34, 30, 31, 33, 32, 36, 37, 38, 39);
+  WHERE detaljtyp NOT IN ('VÄGA0BY.M', 'FÄRJELED'); /* Ignore "Vägar under byggnation", perhaps draw them in the future? */
 
 create index on lmv_bright.roads_tatort (type, stylegroup);
 create index on lmv_bright.roads_tatort using gist (the_geom);
