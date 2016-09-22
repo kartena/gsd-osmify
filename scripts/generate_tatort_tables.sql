@@ -87,8 +87,6 @@ create table tatort_my (
 
 create index on tatort_my USING GIST (the_geom);
 
-
-
 -- Uses ST_Intersection for magic, mostly fetched from the country example.
 -- http://postgis.net/docs/ST_Intersection.html
 insert into tatort_bi
@@ -123,10 +121,12 @@ FROM (SELECT (ST_Dump(ST_Intersection(fastighk_ag.the_geom, fastighk_by.the_geom
     ON ST_Intersects(fastighk_ag.the_geom, fastighk_by.the_geom))  As clipped
 WHERE ST_Dimension(clipped.clipped_geom) = 2; -- 1 is linestring, 0 point, 2 polygon
 
+-- fastighk_my have some self intersecting bad polygons which we try to
+-- ST_MakeValid.
 insert into tatort_my
 SELECT row_number() over () the_geom, *
-FROM (SELECT (ST_Dump(ST_Intersection(fastighk_ag.the_geom, fastighk_my.the_geom))).geom As clipped_geom, fastighk_my.detaljtyp, fastighk_my.adat
+FROM (SELECT (ST_Dump(ST_Intersection(fastighk_ag.the_geom, ST_MakeValid(fastighk_my.the_geom)))).geom As clipped_geom, fastighk_my.detaljtyp, fastighk_my.adat
     FROM fastighk_ag
     INNER JOIN fastighk_my
-    ON ST_Intersects(fastighk_ag.the_geom, fastighk_my.the_geom))  As clipped
+    ON ST_Intersects(fastighk_ag.the_geom, ST_MakeValid(fastighk_my.the_geom)))  As clipped
 WHERE ST_Dimension(clipped.clipped_geom) = 2; -- 1 is linestring, 0 point, 2 polygon
