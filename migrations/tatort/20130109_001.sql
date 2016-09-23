@@ -49,7 +49,7 @@ SELECT s.gid, s.the_geom, s.kkod, s.name, s.type, s.size FROM summary s WHERE rk
 INSERT INTO lmv_bright.area_labels
     SELECT gid + 10000000, the_geom, kkod, text AS name, 'other' AS type, kkod - 59 AS size
     FROM terrang_tx
-    WHERE kkod>=61 AND kkod<=67
+    WHERE kkod>=61 AND kkod<=67;
 
 /*
     This inserts Idrottsanläggningar into area_labels.
