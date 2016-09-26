@@ -45,9 +45,11 @@ def import_shape(maps):
                 IMPORT_MODE_CREATE + IMPORT_MODE_STRUCTURE + IMPORT_MODE_SPATIAL_INDEX,
                 srid, log_file)
 
+        tables = set()
         for f in gsd_map.data_files():
             filename = os.path.splitext(os.path.split(f)[1])[0]
             table = '%s_%s' % (m, filename.split('_')[0])
+            tables.add(table)
             print "Importing %s to %s" % (f, table)
 
             import_fn = get_import_fn(f)
@@ -56,10 +58,14 @@ def import_shape(maps):
                 srid,
                 log_file)
 
+        for table in tables:
             cursor = conn.cursor()
             try:
                 for col in gsd_map.index_columns():
+                    print "Creating index for %s on %s" % (table, col)
                     cursor.execute('create index on %s (%s);' % (table, col))
+                    print "Creating spatial index for %s on the_geom" % (table)
+                    cursor.execute('create index on %s using gist (the_geom);' % (table))
                 conn.commit()
             except:
                 conn.rollback()
