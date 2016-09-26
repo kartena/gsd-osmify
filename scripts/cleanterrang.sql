@@ -37,3 +37,4 @@ drop table terrang_tx_unique;
 drop table terrang_vl;
 drop table terrang_vo;
 drop table terrang_vs;
+drop table terrang_gl;
