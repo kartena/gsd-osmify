@@ -5,7 +5,7 @@ create table lmv_bright.landuse_tatort (
 );
 
 INSERT INTO lmv_bright.landuse_tatort
-    SELECT gid, the_geom,
+    SELECT ogc_fid, the_geom,
     CASE
         WHEN detaljtyp IN ('VATTEN') THEN 'water'
         WHEN detaljtyp IN ('ÖPMARK', 'OSPEC', 'MRKÖVR') THEN 'land'

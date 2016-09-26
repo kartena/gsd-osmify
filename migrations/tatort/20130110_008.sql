@@ -11,7 +11,7 @@ create table lmv_bright.roads (
 );
 
 INSERT INTO lmv_bright.roads
-SELECT gid,
+SELECT row_number() over(),
     the_geom,
     CASE
         WHEN kkod IN (5011, 5016, 5036, 5811, 5816, 5836) THEN 'motorway'
@@ -41,7 +41,7 @@ SELECT gid,
         WHEN kkod >= 5800 THEN 1
         ELSE 0 END AS underpass,
     'yes' as access
-  FROM vagk_vl_joined
+  FROM vagk_vl
   WHERE kkod IN (5011, 5012, 5016, 5017, 5060, 5021, 5022, 5061, 5024, 5025,
     5028, 5029, 5033, 5036, 5040, 5045, 5070, 5071, 5082, 5091,
     5811, 5812, 5816, 5817, 5860, 5821, 5822, 5861, 5824, 5825,

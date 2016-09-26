@@ -8,7 +8,7 @@ create table lmv_bright.road_label (
 );
 
 INSERT INTO lmv_bright.road_label
-    SELECT  gid, the_geom,
+    SELECT row_number() over(), the_geom,
     CASE
         WHEN kkod IN (5011, 5016, 5036, 5811, 5816, 5836, 5012, 5017, 5021, 5024, 5028, 5033, 5812, 5817, 5821, 5824, 5828, 5833) THEN (
     CASE
@@ -25,7 +25,7 @@ INSERT INTO lmv_bright.road_label
         WHEN kkod IN (5025, 5825) THEN 'secondary'
         ELSE 'other' END AS type,
     0 as priority
-    FROM vagk_vl_joined
+    FROM vagk_vl
     WHERE kkod IN (5022, 5025, 5033, 5036, 5822, 5825, 5833, 5836);
 
 INSERT INTO lmv_bright.road_label (gid, the_geom, name, oneway, type, priority)

@@ -30,11 +30,11 @@ create index on named_buildings using gist (the_geom);
 insert into named_buildings (gid, name, type, huvudbyggn, the_geom)
     select b1.ogc_fid, b1.namn1,
     case
-    when andamal_1t in ('Samhällsfunktion; Sjukhus') then 'SJUKHUS'
-    when andamal_1t in ('Samhällsfunktion; Skola') then 'SKOLA'
-    when andamal_1t in ('Samhällsfunktion; Universitet') then 'UNIVERSITET'
-    when andamal_1t in ('Samhällsfunktion; Högskola') then 'HÖGSKOLA'
-    when andamal_1t in ('Samhällsfunktion; Samfund') then 'SAMFUND'
+    when andamal_1t in ('Samhällsfunktion; Sjukhus') then 'hospital'
+    when andamal_1t in ('Samhällsfunktion; Skola') then 'school'
+    when andamal_1t in ('Samhällsfunktion; Universitet') then 'university'
+    when andamal_1t in ('Samhällsfunktion; Högskola') then 'university'
+    when andamal_1t in ('Samhällsfunktion; Samfund') then 'religous'
     else ''
     end, b1.huvudbyggn, b1.the_geom
     from public.tatort_by b1
