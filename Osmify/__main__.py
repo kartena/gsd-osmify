@@ -64,8 +64,6 @@ def import_shape(maps):
                 for col in gsd_map.index_columns():
                     print "Creating index for %s on %s" % (table, col)
                     cursor.execute('create index on %s (%s);' % (table, col))
-                    print "Creating spatial index for %s on the_geom" % (table)
-                    cursor.execute('create index on %s using gist (the_geom);' % (table))
                 conn.commit()
             except:
                 conn.rollback()
