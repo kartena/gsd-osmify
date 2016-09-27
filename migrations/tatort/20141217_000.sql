@@ -35,7 +35,7 @@ insert into named_buildings (gid, name, type, huvudbyggn, the_geom)
     when andamal_1t in ('Samhällsfunktion; Universitet') then 'university'
     when andamal_1t in ('Samhällsfunktion; Högskola') then 'university'
     when andamal_1t in ('Samhällsfunktion; Samfund') then 'religous'
-    else ''
+    else 'other'
     end, b1.huvudbyggn, b1.the_geom
     from public.tatort_by b1
     where b1.namn1!='';

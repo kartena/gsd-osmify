@@ -77,6 +77,7 @@ insert into lmv_bright.building_points
         WHEN kategori in ('Hus, storleksklass 2') THEN 'house2'
         WHEN kategori in ('Hus, storleksklass 3') THEN 'house3'
         WHEN kategori in ('Hus, storleksklass 4') THEN 'house4'
+        END as type,
         the_geom
     from terrang_bs where kategori in ('Gård', 'Herrgård', 'Slott') or kategori like 'Hus,%';
 

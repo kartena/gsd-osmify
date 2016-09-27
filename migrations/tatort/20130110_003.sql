@@ -19,10 +19,16 @@ create table lmv_bright.railway_tatort (
 INSERT INTO lmv_bright.railway_tatort
     SELECT ogc_fid, the_geom,
     CASE
-    WHEN detaljtyp in ('JVGR1.M', 'JVGR2.M', 'JVGU.M') THEN 'railway'
-    WHEN detaljtyp in ('JVGÖ.M', 'JVGÖU.M') THEN 'tram'
+    WHEN spartyp in (3) THEN 'railway'
+    WHEN spartyp in (1) THEN 'tram'
+    WHEN spartyp in (2) THEN 'subway'
     END AS type,
-    'railway' AS stylegroup, FALSE AS bridge, FALSE AS tunnel FROM tatort_jl
+    'railway' AS stylegroup,
+    FALSE AS bridge,
+    CASE
+    WHEN niva = 2 THEN TRUE
+    ELSE FALSE
+    END AS tunnel FROM tatort_jl
     WHERE detaljtyp != 'JVGBY.M';
 
 INSERT INTO lmv_bright.railway

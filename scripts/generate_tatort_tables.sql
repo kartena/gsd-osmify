@@ -87,6 +87,20 @@ create table tatort_my (
 
 create index on tatort_my USING GIST (the_geom);
 
+create table tatort_js (
+    ogc_fid integer primary key not null,
+    the_geom geometry,
+    detaljtyp varchar(10),
+    adat varchar(16),
+    xyfel float,
+    namn varchar(45),
+    spartyp float,
+    niva float
+);
+
+create index on tatort_js using GIST (the_geom);
+
+
 -- Uses ST_Intersection for magic, mostly fetched from the country example.
 -- http://postgis.net/docs/ST_Intersection.html
 insert into tatort_bi
@@ -132,3 +146,13 @@ FROM (SELECT (ST_Dump(ST_Intersection(fastighk_ag.the_geom, fastighk_my.the_geom
     WHERE ST_IsValid(fastighk_my.the_geom)
 )  As clipped
 WHERE ST_Dimension(clipped.clipped_geom) = 2; -- 1 is linestring, 0 point, 2 polygon
+
+insert into tatort_js
+SELECT row_number() over () the_geom, *
+FROM (SELECT (ST_Dump(ST_Intersection(fastighk_ag.the_geom, fastighk_js.the_geom))).geom As clipped_geom, fastighk_js.detaljtyp, fastighk_js.adat, fastighk_js.xyfel, fastighk_js.namn, fastighk_js.spartyp, fastighk_js.niva
+    FROM fastighk_ag
+    INNER JOIN fastighk_js
+    ON ST_Intersects(fastighk_ag.the_geom, fastighk_js.the_geom))  As clipped
+WHERE ST_Dimension(clipped.clipped_geom) = 0; -- 1 is linestring, 0 point, 2 polygon
+
+
