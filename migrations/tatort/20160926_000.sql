@@ -56,7 +56,7 @@ insert into lmv_bright.admin
     select gid,
         'country',
         the_geom
-    from vagk_vo where kategori = 'Riksgräns';
+    from vagk_al where kategori = 'Riksgräns';
 
 
 CREATE TABLE "lmv_bright"."building_points" (
