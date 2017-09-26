@@ -1,6 +1,6 @@
 
 insert into lmv_bright.poi (gid, the_geom, type)
-    select row_number() over()+10000000,
+    select row_number() over()+100000000,
         the_geom,
         CASE
         WHEN kategori in ('Gästhamn') THEN 'port'
