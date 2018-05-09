@@ -15,7 +15,7 @@ create table lmv_bright.railway_tatort (
     bridge boolean,
     tunnel boolean
 );
-
+/*
 INSERT INTO lmv_bright.railway_tatort
     SELECT gid, the_geom,
     CASE
@@ -30,6 +30,7 @@ INSERT INTO lmv_bright.railway_tatort
 INSERT INTO lmv_bright.railway
     SELECT gid, the_geom, 'railway' AS type, 'railway' AS stylegroup, FALSE AS bridge, FALSE AS tunnel
     FROM vagk_jl;
+    */
 
 create index on lmv_bright.railway (type, stylegroup);
 create index on lmv_bright.railway using gist (the_geom);

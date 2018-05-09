@@ -9,7 +9,7 @@ create table lmv_bright.roads (
     underpass smallint,
     access varchar(4)
 );
-
+/*
 INSERT INTO lmv_bright.roads
 SELECT gid,
     the_geom,
@@ -46,6 +46,7 @@ SELECT gid,
     5028, 5029, 5033, 5036, 5040, 5045, 5070, 5071, 5082, 5091,
     5811, 5812, 5816, 5817, 5860, 5821, 5822, 5861, 5824, 5825,
     5828, 5829, 5833, 5836, 5840, 5845, 5870, 5871, 5882, 5891);
+*/
 
 create index on lmv_bright.roads (type);
 create index on lmv_bright.roads using gist (the_geom);

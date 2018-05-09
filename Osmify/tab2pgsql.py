@@ -79,8 +79,13 @@ if __name__ == '__main__':
     import os.path
     from sys import argv
 
-    conn = psycopg2.connect("host=%s dbname=%s user=%s password=%s" % \
-        (config.db['host'], config.db['name'], config.db['user'], config.db['password']))
+    try:
+        port = config.db['port']
+    except:
+        port = '5432'
+
+    conn = psycopg2.connect("host=%s dbname=%s user=%s password=%s port=%s" % \
+        (config.db['host'], config.db['name'], config.db['user'], config.db['password'], port))
 
     for shape_file in argv[1:len(argv)]:
         table = os.path.splitext(os.path.split(shape_file)[1])[0]

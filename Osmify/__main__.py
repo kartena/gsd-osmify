@@ -70,7 +70,7 @@ def import_shape(maps):
             finally:
                 cursor.close()
 
-            vacuum_analyze(conn, table)
+            #vacuum_analyze(conn, table)
 
 def get_import_fn(filepath):
     file_type = os.path.splitext(filepath)[1]
@@ -86,19 +86,29 @@ if config.log_file is not None:
 else:
     log_file = open(os.devnull, 'w')
 
-conn = psycopg2.connect("host=%s dbname=%s user=%s password=%s" %
-    (config.db['host'], config.db['name'], config.db['user'], config.db['password']))
+try:
+    print 'trying port from config'
+    port = config.db['port']
+except:
+    print 'using default port'
+    port = '5432'
+
+print '%s' % port
+conn = psycopg2.connect("host=%s dbname=%s user=%s password=%s port=%s" %
+    (config.db['host'], config.db['name'], config.db['user'], config.db['password'], port))
 
 scope = argv[1]
 maps = [x for x in ['oversikt', 'terrang', 'vagk', 'tatort', 'fastighk'] if scope == 'all' or x == scope]
 
-migrations_dir = config.migrations_dir \
-    if hasattr(config, 'migrations_dir') \
-    else 'migrations'
-migrate = MigratePostgres(conn, migrations_dir, True)
+import_shape(maps)
 
-if not migrate.get_current_version():
-    import_shape(maps)
+## migrations_dir = config.migrations_dir \
+##     if hasattr(config, 'migrations_dir') \
+##     else 'migrations'
+## migrate = MigratePostgres(conn, migrations_dir, True)
+## 
+## if not migrate.get_current_version():
+##     import_shape(maps)
 
 #TODO: version
-migrate.migrate()
+# migrate.migrate()

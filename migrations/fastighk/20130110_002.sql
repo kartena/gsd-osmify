@@ -9,6 +9,7 @@ create table lmv_bright.motorway_label (
     euro_road smallint
 );
 
+/*
 INSERT INTO lmv_bright.motorway_label
     SELECT gid, ST_CENTROID(the_geom), n AS name, n AS ref, CHAR_LENGTH(n) AS reflen,
         0 as oneway, 
@@ -30,6 +31,7 @@ INSERT INTO lmv_bright.motorway_label
         WHERE kkod IN (5011, 5012, 5016, 5017, 5021, 5024, 5028, 5811, 5812, 5816, 5817, 5821, 5824, 5828)
     ) AS road
     WHERE n IS NOT NULL AND CHAR_LENGTH(n) > 0;
+*/
 
 create index on lmv_bright.motorway_label (type, euro_road);
 create index on lmv_bright.motorway_label using gist (the_geom);
