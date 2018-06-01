@@ -2,6 +2,8 @@
    Fastighetskartan. */
 DELETE FROM lmv_bright.road_label;
 
+ALTER TABLE lmv_bright.road_label ALTER COLUMN name TYPE varchar(100);
+
 INSERT INTO lmv_bright.road_label (gid, the_geom, name, oneway, type, priority)
     SELECT ogc_fid, ST_MULTI(the_geom),
     CASE
