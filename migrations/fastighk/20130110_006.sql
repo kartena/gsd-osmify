@@ -4,8 +4,6 @@ create table lmv_bright.buildings (
 );
 
 INSERT INTO lmv_bright.buildings
-    SELECT gid, the_geom FROM tatort_by
-    UNION
-    SELECT gid+10000000, the_geom FROM tatort_bf;
+    SELECT ogc_fid, the_geom FROM tatort_by;
 
 create index on lmv_bright.buildings using gist (the_geom);

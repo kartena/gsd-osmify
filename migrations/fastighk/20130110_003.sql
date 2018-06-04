@@ -17,15 +17,19 @@ create table lmv_bright.railway_tatort (
 );
 
 INSERT INTO lmv_bright.railway_tatort
-    SELECT gid, the_geom,
+    SELECT ogc_fid, the_geom,
     CASE
-    WHEN kod=50 THEN 'railway'
-    WHEN kod=51 THEN 'subway'
-    WHEN kod=52 THEN 'tram'
-    WHEN kod=53 THEN 'subway'
+    WHEN spartyp in (3) THEN 'railway'
+    WHEN spartyp in (1) THEN 'tram'
+    WHEN spartyp in (2) THEN 'subway'
     END AS type,
-    'railway' AS stylegroup, FALSE AS bridge, FALSE AS tunnel FROM tatort_jl
-    WHERE kod IN (50, 51, 52, 53);
+    'railway' AS stylegroup,
+    FALSE AS bridge,
+    CASE
+    WHEN niva = 2 THEN TRUE
+    ELSE FALSE
+    END AS tunnel FROM tatort_jl
+    WHERE detaljtyp != 'JVGBY.M';
 
 INSERT INTO lmv_bright.railway
     SELECT gid, the_geom, 'railway' AS type, 'railway' AS stylegroup, FALSE AS bridge, FALSE AS tunnel

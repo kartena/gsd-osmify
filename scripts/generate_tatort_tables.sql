@@ -51,7 +51,6 @@ create index on tatort_jl USING GIST (the_geom);
 create table tatort_by (
     ogc_fid integer primary key not null,
     the_geom geometry,
-    fnr_br varchar(14),
     detaljtyp varchar(10),
     adat varchar(16),
     objekt_id varchar(36),
@@ -129,7 +128,7 @@ WHERE ST_Dimension(clipped.clipped_geom) = 1; -- 1 is linestring, 0 point, 2 pol
 
 insert into tatort_by
 SELECT row_number() over () the_geom, *
-FROM (SELECT (ST_Dump(ST_Intersection(fastighk_ag.the_geom, fastighk_by.the_geom))).geom As clipped_geom, fastighk_by.fnr_br, fastighk_by.detaljtyp, fastighk_by.adat, fastighk_by.objekt_id, fastighk_by.objekt_ver, fastighk_by.insam_lage, fastighk_by.xyfel, fastighk_by.namn1, fastighk_by.namn2, fastighk_by.namn3, fastighk_by.huvudbyggn, fastighk_by.andamal_1, fastighk_by.andamal_1t, fastighk_by.andamal_2, fastighk_by.andamal_3, fastighk_by.andamal_4, fastighk_by.andamal_5, fastighk_by.andamal_6, fastighk_by.andamal_7, fastighk_by.andamal_8, fastighk_by.andamal_9, fastighk_by.andamal_10
+FROM (SELECT (ST_Dump(ST_Intersection(fastighk_ag.the_geom, fastighk_by.the_geom))).geom As clipped_geom, fastighk_by.detaljtyp, fastighk_by.adat, fastighk_by.objekt_id, fastighk_by.objekt_ver, fastighk_by.insam_lage, fastighk_by.xyfel, fastighk_by.namn1, fastighk_by.namn2, fastighk_by.namn3, fastighk_by.huvudbyggn, fastighk_by.andamal_1, fastighk_by.andamal_1t, fastighk_by.andamal_2, fastighk_by.andamal_3, fastighk_by.andamal_4, fastighk_by.andamal_5, fastighk_by.andamal_6, fastighk_by.andamal_7, fastighk_by.andamal_8, fastighk_by.andamal_9, fastighk_by.andamal_10
     FROM fastighk_ag
     INNER JOIN fastighk_by
     ON ST_Intersects(fastighk_ag.the_geom, fastighk_by.the_geom))  As clipped

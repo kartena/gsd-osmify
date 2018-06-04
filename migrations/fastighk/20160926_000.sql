@@ -22,13 +22,13 @@ CREATE TABLE "lmv_bright"."aeroway" (
     the_geom geometry(MultiPolygon, 3006)
 );
 
---CREATE INDEX ON lmv_bright.aeroway USING GIST (the_geom);
---
---insert into lmv_bright.aeroway
---    select gid,
---        'runway',
---        the_geom
---    from terrang_hl where kategori = 'Flygbana, belagd';
+CREATE INDEX ON lmv_bright.aeroway USING GIST (the_geom);
+
+insert into lmv_bright.aeroway
+    select gid,
+        'runway',
+        the_geom
+    from terrang_hl where kategori = 'Flygbana, belagd';
 
 CREATE TABLE "lmv_bright"."ferries" (
     gid int primary key,
@@ -42,7 +42,7 @@ insert into lmv_bright.ferries
     select gid,
         'ferries',
         the_geom
-    from fastighk_vl where detaljtyp = 'FÄRJELED';
+    from vagk_vo where kategori = 'Färjeled';
 
 CREATE TABLE "lmv_bright"."admin" (
     gid int primary key,
