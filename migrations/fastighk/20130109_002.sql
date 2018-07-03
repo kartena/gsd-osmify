@@ -11,18 +11,35 @@ create table lmv_bright.place (
 select AddGeometryColumn('lmv_bright', 'place', 'the_geom', 3006, 'POINT', 2);
 
 INSERT INTO lmv_bright.place
-    SELECT gid, kkod, text as name, text as src_name,
-    CASE
-    /* Larger places selected from oversikt_mb */
-    WHEN kkod IN (4, 3, 2) THEN 'hamlet'
-    WHEN kkod IN (1) THEN 'locality'
-    WHEN kkod IN (11, 12, 13) THEN 'suburb' /* Tätortsdel */
-    ELSE 'other' END AS type,
-    'other' AS size,
-    kkod as priority,
-    ST_SetSRID(the_geom, 3006) /* Should not be necessary if vagk_tx has SRID properly set */
-    FROM vagk_tx
-    WHERE kkod IN (1, 2, 3, 4, 11, 12, 13);
+    select gid, kkod, name, src_name, type, size,                          
+    kkod as priority,                         
+    ST_SetSRID(ST_Centroid(the_geom), 3006) 
+    FROM (
+      SELECT MIN(gid) gid, the_geom the_geom, MIN(kkod) kkod, 
+        text as name,
+        text as src_name,
+        CASE 
+        WHEN kkod IN (4, 3, 2) THEN 'hamlet'      
+        WHEN kkod IN (1) THEN 'locality'          
+        WHEN kkod IN (11, 12, 13) THEN 'suburb' 
+        ELSE 'other' END AS type,                 
+        'other' AS size
+        FROM vagk_tx
+        WHERE kkod IN (1, 2, 3, 4, 11, 12, 13)
+        GROUP BY kkod, text, the_geom) as onion;
+
+--    SELECT gid, kkod, text as name, text as src_name,
+--    CASE
+--    /* Larger places selected from oversikt_mb */
+--    WHEN kkod IN (4, 3, 2) THEN 'hamlet'
+--    WHEN kkod IN (1) THEN 'locality'
+--    WHEN kkod IN (11, 12, 13) THEN 'suburb' /* Tätortsdel */
+--    ELSE 'other' END AS type,
+--    'other' AS size,
+--    kkod as priority,
+--    ST_SetSRID(the_geom, 3006) /* Should not be necessary if vagk_tx has SRID properly set */
+--    FROM vagk_tx
+--    WHERE kkod IN (1, 2, 3, 4, 11, 12, 13);
 
 
 /* Idea: instead of choosing arbitrary limits for what constitutes a major city, 
@@ -58,13 +75,13 @@ create index on lmv_bright.place using gist (the_geom);
 
 /* Filter out places with the same name that are less than 10 km
    from each other, since they're most likely duplicates. */
- delete from lmv_bright.place where gid in (
-     select p2.gid
-     from lmv_bright.place p1
-     inner join lmv_bright.place p2 
-         on p1.gid!=p2.gid /* don't do < or other smart things, has to be by priority */
-         and p1.src_name=p2.src_name
-         and p1.priority>=p2.priority
-     where st_distance(p1.the_geom, p2.the_geom) < 10000);
+delete from lmv_bright.place where gid in (
+    select p2.gid
+    from lmv_bright.place p1, lmv_bright.place p2 
+    where p1.gid!=p2.gid /* don't do < or other smart things, has to be by priority */
+        and p1.src_name=p2.src_name
+        and p1.priority>=p2.priority
+        and st_distance(p1.the_geom, p2.the_geom) < 10000
+        and st_distance(p1.the_geom, p2.the_geom) > 0);
 
-alter table lmv_bright.place drop column src_name;
+--alter table lmv_bright.place drop column src_name;
